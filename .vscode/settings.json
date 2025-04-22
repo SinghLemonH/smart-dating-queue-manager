@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "hashtable.h": "c",
+        "auth.h": "c"
+    }
+}
