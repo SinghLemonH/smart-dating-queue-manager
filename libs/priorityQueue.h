@@ -19,6 +19,7 @@ void addPartner(const char* userLocation, const char* partnerName, const char* p
 void deletePartner(const char* partnerName);
 void viewPartnerStatus();
 void freePriorityQueue();
+
 const char* getRelationshipLevel(int score);
 
 #endif // PRIORITYQUEUE_H
