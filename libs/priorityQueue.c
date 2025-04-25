@@ -55,8 +55,7 @@ void addPartner(const char* userLocation, const char* partnerName, const char* p
     savePartnersToFile(uid);
 }
 
-// Delete a partner from the priority queue
-void deletePartner(const char* partnerName) {
+void deletePartner(const char* partnerName, const char* uid) {
     if (head == NULL) {
         printf("Priority Queue is empty.\n");
         return;
@@ -86,6 +85,9 @@ void deletePartner(const char* partnerName) {
             }
             free(current);
             printf("Partner %s deleted successfully!\n", partnerName);
+
+            // บันทึก Priority Queue ลงไฟล์ CSV
+            savePartnersToFile(uid);
             return;
         }
         prev = current;

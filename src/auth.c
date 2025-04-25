@@ -11,13 +11,16 @@
 void loginMenu(const char* filename) {
     int choice;
     do {
-        printf("\n=== Login Menu ===\n");
-        printf("1. Login\n");
-        printf("2. Register\n");
-        printf("3. Exit\n");
+        printf("\n+-----------------------------------+\n");
+        printf("|             LOGIN MENU            |\n");
+        printf("+-----------------------------------+\n");
+        printf("| 1. Login                          |\n");
+        printf("| 2. Register                       |\n");
+        printf("| 3. Exit                           |\n");
+        printf("+-----------------------------------+\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
-
+        
         switch (choice) {
             case 1:
                 login(filename);
@@ -26,35 +29,37 @@ void loginMenu(const char* filename) {
                 registerUser(filename, 2025); // Example year for UID generation
                 break;
             case 3:
-                printf("Exiting the system. Goodbye!\n");
+                printf("\nExiting the system. Goodbye!\n");
                 break;
             default:
-                printf("Invalid choice. Please try again.\n");
+                printf("\nInvalid choice. Please try again.\n");
         }
     } while (choice != 3);
 }
 
-// Function to display the main menu
 void mainMenu(const char* filename, const char* uid) {
     int choice;
     do {
-        printf("\n=== Main Menu ===\n");
-        printf("1. View Partners Status\n");
-        printf("2. Add Partner\n");
-        printf("3. Delete Partner\n");
-        printf("4. Schedule a date\n");
-        printf("5. View Schedule\n");
-        printf("6. Logout\n");
+        printf("\n+-----------------------------------+\n");
+        printf("|           MAIN MENU               |\n");
+        printf("+-----------------------------------+\n");
+        printf("| 1. View Partners Status           |\n");
+        printf("| 2. Add Partner                    |\n");
+        printf("| 3. Delete Partner                 |\n");
+        printf("| 4. Schedule a date                |\n");
+        printf("| 5. View Schedule                  |\n");
+        printf("| 6. Logout                         |\n");
+        printf("+-----------------------------------+\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
             case 1:
-                printf("Viewing partner status for UID: %s\n", uid);
+                printf("\nViewing partner status for UID: %s\n", uid);
                 viewPartnerStatus(); // เรียกฟังก์ชันแสดงตารางนัดหมาย
                 break;
             case 2: {
-                printf("Adding partner for UID: %s\n", uid);
+                printf("\nAdding partner for UID: %s\n", uid);
                 char partnerName[50], partnerLocation[50];
                 int relationshipScore;
 
@@ -69,68 +74,25 @@ void mainMenu(const char* filename, const char* uid) {
                 break;
             }
             case 3: {
-                printf("Deleting partner for UID: %s\n", uid);
+                printf("\nDeleting partner for UID: %s\n", uid);
                 char partnerName[50];
                 printf("Enter Partner Name to Delete: ");
                 scanf("%s", partnerName);
 
-                deletePartner(partnerName); // ลบ Partner
+                deletePartner(partnerName, uid); // ลบ Partner
                 break;
             }
-            case 4: {
-                printf("Scheduling a date...\n");
-                int graph[MAX_LOCATIONS][MAX_LOCATIONS];
-                char locations[MAX_LOCATIONS][50];
-                int locationCount;
-            
-                // Load graph from distance.csv
-                loadGraphFromFile("data/distance.csv", graph, locations, &locationCount);
-            
-                char destination[50];
-                printf("Enter destination: ");
-                scanf("%s", destination);
-            
-                int distance = findShortestPath(graph, locationCount, "KMUTT", destination, locations);
-                if (distance != -1) {
-                    printf("Scheduled a date at %s (Distance: %d km)\n", destination, distance);
-                }
+            case 4:
+                printf("\nScheduling a date...\n");
                 break;
-            }
-            case 5: {
-                printf("Viewing schedule...\n");
-            
-                // ตรวจสอบว่ามี Partner หรือไม่
-                if (head == NULL) {
-                    printf("No partners available to schedule.\n");
-                    break;
-                }
-            
-                int graph[MAX_LOCATIONS][MAX_LOCATIONS];
-                char locations[MAX_LOCATIONS][50];
-                int locationCount;
-            
-                // Load graph from distance.csv
-                loadGraphFromFile("data/distance.csv", graph, locations, &locationCount);
-            
-                Partner* current = head;
-                while (current != NULL) {
-                    // คำนวณระยะทางจาก KMUTT ไปยังสถานที่ของ Partner
-                    int distance = findShortestPath(graph, locationCount, "KMUTT", current->place, locations);
-                    if (distance != -1) {
-                        printf("Name: %s, Place: %s, Distance: %d km, Relationship Score: %d\n",
-                               current->name, current->place, distance, current->relationshipScore);
-                    } else {
-                        printf("Error: Could not calculate distance to %s\n", current->place);
-                    }
-                    current = current->next;
-                }
+            case 5:
+                printf("\nViewing schedule...\n");
                 break;
-            }
             case 6:
-                printf("Exiting user menu. Goodbye!\n");
+                printf("\nExiting user menu. Goodbye!\n");
                 break;
             default:
-                printf("Invalid choice. Please try again.\n");
+                printf("\nInvalid choice. Please try again.\n");
         }
     } while (choice != 6);
 }
