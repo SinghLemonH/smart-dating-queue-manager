@@ -16,7 +16,7 @@ extern Partner* tail; // ท้ายของ Priority Queue
 
 // Priority Queue functions
 void addPartner(const char* userLocation, const char* partnerName, const char* partnerLocation, int relationshipScore, const char* uid);
-void deletePartner(const char* partnerName);
+void deletePartner(const char* partnerName, const char* uid);
 void viewPartnerStatus();
 void freePriorityQueue();
 
