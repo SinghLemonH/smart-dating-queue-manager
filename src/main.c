@@ -3,16 +3,16 @@
 #include "../include/dataManage.h"
 
 int main() {
-    const char* filename = "data/users.csv";
+    const char* userFile = "data/users.csv";
 
-    // Ensure the file exists
-    createFileIfNotExists(filename);
+    // Ensure the user file exists
+    createFileIfNotExists(userFile, NULL);
 
     // Load users from file
-    loadUsersFromFile(filename);
+    loadUsersFromFile(userFile);
 
     // Display the login menu
-    loginMenu(filename);
+    loginMenu(userFile);
 
     return 0;
 }

@@ -8,24 +8,22 @@ Partner* head = NULL; // หัวของ Priority Queue
 Partner* tail = NULL; // ท้ายของ Priority Queue
 
 // Add a partner to the priority queue
-void addPartner(const char* userLocation, const char* partnerName, const char* partnerLocation, int relationshipScore, const char* uid) {
-    int distance = getDistance(userLocation, partnerLocation);
-    if (distance == -1) {
-        printf("Error: Could not find distance for location %s to %s\n", userLocation, partnerLocation);
+void addPartner(const char* partnerName, int relationshipScore, const char* uid) {
+    // สร้างโหนดใหม่สำหรับ Partner
+    Partner* newPartner = (Partner*)malloc(sizeof(Partner));
+    if (!newPartner) {
+        printf("Error: Memory allocation failed.\n");
         return;
     }
 
-    Partner* newPartner = (Partner*)malloc(sizeof(Partner));
+    // กำหนดค่าข้อมูลของ Partner
     strcpy(newPartner->name, partnerName);
-    strcpy(newPartner->place, partnerLocation);
     newPartner->relationshipScore = relationshipScore;
-    newPartner->distance = distance;
     newPartner->next = NULL;
 
-    // Insert into Priority Queue (sorted by relationshipScore and distance)
-    if (head == NULL || 
-        (relationshipScore > head->relationshipScore) || 
-        (relationshipScore == head->relationshipScore && distance < head->distance)) {
+    // แทรก Partner ลงใน Priority Queue (เรียงตาม relationshipScore)
+    if (head == NULL || relationshipScore > head->relationshipScore) {
+        // กรณีที่ Priority Queue ว่าง หรือ Partner ใหม่มีคะแนนสูงสุด
         newPartner->next = head;
         head = newPartner;
 
@@ -34,10 +32,9 @@ void addPartner(const char* userLocation, const char* partnerName, const char* p
             tail = newPartner;
         }
     } else {
+        // กรณีที่ต้องแทรก Partner ในตำแหน่งที่เหมาะสม
         Partner* current = head;
-        while (current->next != NULL && 
-              (current->next->relationshipScore > relationshipScore || 
-              (current->next->relationshipScore == relationshipScore && current->next->distance <= distance))) {
+        while (current->next != NULL && current->next->relationshipScore >= relationshipScore) {
             current = current->next;
         }
         newPartner->next = current->next;
@@ -49,9 +46,9 @@ void addPartner(const char* userLocation, const char* partnerName, const char* p
         }
     }
 
-    printf("Partner %s added successfully!\n", partnerName);
+    printf("Partner %s added successfully with relationship score %d.\n", partnerName, relationshipScore);
 
-    // Save Priority Queue to partner_UID.csv
+    // บันทึก Priority Queue ลงไฟล์ CSV
     savePartnersToFile(uid);
 }
 
@@ -63,58 +60,84 @@ void deletePartner(const char* partnerName, const char* uid) {
 
     Partner* current = head;
     Partner* prev = NULL;
+    Partner* target = NULL; // โหนดที่ต้องการลบ
+    Partner* targetPrev = NULL; // โหนดก่อนหน้า target
 
+    // ค้นหา Partner ที่มีชื่อที่ตรงกัน โดยเริ่มจากคะแนนต่ำสุดไปสูงสุด
     while (current != NULL) {
         if (strcmp(current->name, partnerName) == 0) {
-            if (prev == NULL) {
-                // ลบ Partner ตัวแรก
-                head = current->next;
-
-                // อัปเดต tail หากลบ Partner ตัวสุดท้าย
-                if (head == NULL) {
-                    tail = NULL;
-                }
-            } else {
-                // ลบ Partner ตรงกลางหรือท้าย
-                prev->next = current->next;
-
-                // อัปเดต tail หากลบ Partner ตัวสุดท้าย
-                if (current == tail) {
-                    tail = prev;
-                }
-            }
-            free(current);
-            printf("Partner %s deleted successfully!\n", partnerName);
-
-            // บันทึก Priority Queue ลงไฟล์ CSV
-            savePartnersToFile(uid);
-            return;
+            target = current;
+            targetPrev = prev;
         }
         prev = current;
         current = current->next;
     }
 
-    printf("Partner %s not found in the queue.\n", partnerName);
+    if (target == NULL) {
+        printf("Partner %s not found in the queue.\n", partnerName);
+        return;
+    }
+
+    // ลบ Partner ที่พบ
+    if (targetPrev == NULL) {
+        // ลบ Partner ตัวแรก
+        head = target->next;
+
+        // อัปเดต tail หากลบ Partner ตัวสุดท้าย
+        if (head == NULL) {
+            tail = NULL;
+        }
+    } else {
+        // ลบ Partner ตรงกลางหรือท้าย
+        targetPrev->next = target->next;
+
+        // อัปเดต tail หากลบ Partner ตัวสุดท้าย
+        if (target == tail) {
+            tail = targetPrev;
+        }
+    }
+
+    free(target);
+    printf("Partner %s deleted successfully!\n", partnerName);
+
+    // บันทึก Priority Queue ลงไฟล์ CSV
+    savePartnersToFile(uid);
 }
 
-// View the partner status (Priority Queue)
-void viewPartnerStatus() {
+/*!!!!!!This func have the problem!!!!!!!
+1)after you run program and logout and login again it's will view csv old uid last login
+2)after view it's delet data of partners detail in csv */
+
+void viewPartnerStatus(const char* uid) {
+    // ตรวจสอบและสร้างไฟล์หากยังไม่มี
+    createFileIfNotExists("data/partners/partner_%s.csv", uid);
+
+    // ล้าง Priority Queue ก่อนโหลดข้อมูลใหม่
+    freePriorityQueue();
+
+    // โหลดข้อมูลจากไฟล์ของ UID ปัจจุบัน
+    loadPartnersFromFile(uid);
+
     if (head == NULL) {
         printf("No partners available.\n");
         return;
     }
 
-    printf("\n=== Partner Status ===\n");
+    printf("\n+-----------------------------------+\n");
+    printf("|         Partner Status            |\n");
+    printf("+-----------------------------------+\n");
+    printf("| Name                | Score       |\n");
+    printf("+-----------------------------------+\n");
+
     Partner* current = head;
     while (current != NULL) {
-        const char* level = getRelationshipLevel(current->relationshipScore); // แปลงคะแนนเป็นชื่อระดับ
-        printf("Name: %s, Place: %s, Relationship Score: %d (%s), Distance: %d km\n",
-               current->name, current->place, current->relationshipScore, level, current->distance);
+        printf("| %-20s | %-10d |\n", current->name, current->relationshipScore);
         current = current->next;
     }
+
+    printf("+-----------------------------------+\n");
 }
 
-// Free the memory used by the Priority Queue
 void freePriorityQueue() {
     Partner* current = head;
     while (current != NULL) {

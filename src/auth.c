@@ -56,22 +56,21 @@ void mainMenu(const char* filename, const char* uid) {
         switch (choice) {
             case 1:
                 printf("\nViewing partner status for UID: %s\n", uid);
-                viewPartnerStatus(); // เรียกฟังก์ชันแสดงตารางนัดหมาย
+                viewPartnerStatus(uid); // เรียกฟังก์ชันแสดงตารางนัดหมาย
                 break;
             case 2: {
                 printf("\nAdding partner for UID: %s\n", uid);
-                char partnerName[50], partnerLocation[50];
+                char partnerName[50];
                 int relationshipScore;
-
+            
                 printf("Enter Partner Name: ");
                 scanf("%s", partnerName);
-                printf("Enter Partner Location: ");
-                scanf("%s", partnerLocation);
                 printf("Enter Relationship Score: ");
                 scanf("%d", &relationshipScore);
-
-                addPartner("KMUTT", partnerName, partnerLocation, relationshipScore, uid); // เพิ่ม Partner
-                break;
+            
+                // เพิ่ม Partner โดยไม่ต้องใช้ userLocation หรือ partnerLocation
+                addPartner(partnerName, relationshipScore, uid);
+                break; 
             }
             case 3: {
                 printf("\nDeleting partner for UID: %s\n", uid);
@@ -89,7 +88,7 @@ void mainMenu(const char* filename, const char* uid) {
                 printf("\nViewing schedule...\n");
                 break;
             case 6:
-                printf("\nExiting user menu. Goodbye!\n");
+                logout();
                 break;
             default:
                 printf("\nInvalid choice. Please try again.\n");
@@ -164,4 +163,10 @@ void registerUser(const char* filename, int year) {
     saveUsersToFile(filename);
 
     printf("Registration successful! Your UID is %s\n", uid);
+}
+
+void logout() {
+    printf("Logging out...\n");
+    freePriorityQueue(); // ล้าง Priority Queue เมื่อ Logout
+    printf("Logged out successfully.\n");
 }

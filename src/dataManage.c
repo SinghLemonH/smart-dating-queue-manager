@@ -5,27 +5,34 @@
 #include "../include/dataManage.h"
 #include "../libs/priorityQueue.h"
 
-// Function to check if the file exists
-int fileExists(const char* filename) {
+int fileExists(const char* format, const char* uid) {
+    char filename[100];
+    sprintf(filename, format, uid);
+
     FILE* file = fopen(filename, "r");
     if (file) {
         fclose(file);
-        return 1; // File exists
+        return 1; // ไฟล์มีอยู่
     }
-    return 0; // File does not exist
+    return 0; // ไฟล์ไม่มีอยู่
 }
 
-// Function to create the file if it does not exist
-void createFileIfNotExists(const char* filename) {
-    if (!fileExists(filename)) {
+void createFileIfNotExists(const char* format, const char* uid) {
+    char filename[100];
+    sprintf(filename, format, uid);
+
+    FILE* file = fopen(filename, "r");
+    if (!file) {
         printf("File %s does not exist. Creating a new one...\n", filename);
-        FILE* file = fopen(filename, "w");
+        file = fopen(filename, "w");
         if (!file) {
             perror("Error creating file");
             exit(1); // Exit the program if file creation fails
         }
         fclose(file);
         printf("File %s created successfully.\n", filename);
+    } else {
+        fclose(file);
     }
 }
 
@@ -74,23 +81,20 @@ void loadPartnersFromFile(const char* uid) {
 
     FILE* file = fopen(filename, "r");
     if (!file) {
-        perror("Error opening partner file");
+        printf("No partner file found for UID: %s\n", uid);
         return;
     }
 
     char line[256];
     while (fgets(line, sizeof(line), file)) {
-        char name[50], place[50];
-        int relationshipScore, distance;
+        char name[50];
+        int relationshipScore;
 
         // อ่านข้อมูลจากไฟล์ CSV
-        if (sscanf(line, "%[^,],%[^,],%d,%d", name, place, &relationshipScore, &distance) == 4) {
-            // เพิ่ม Partner เข้า Priority Queue
+        if (sscanf(line, "%[^,],%d", name, &relationshipScore) == 2) {
             Partner* newPartner = (Partner*)malloc(sizeof(Partner));
             strcpy(newPartner->name, name);
-            strcpy(newPartner->place, place);
             newPartner->relationshipScore = relationshipScore;
-            newPartner->distance = distance;
             newPartner->next = NULL;
 
             // เพิ่ม Partner เข้า Priority Queue
@@ -105,10 +109,9 @@ void loadPartnersFromFile(const char* uid) {
     }
 
     fclose(file);
-    printf("Partner data loaded from %s\n", filename);
+    printf("Partners loaded successfully for UID: %s\n", uid);
 }
 
-// Save Priority Queue to partner_UID.csv
 void savePartnersToFile(const char* uid) {
     char filename[100];
     sprintf(filename, "data/partners/partner_%s.csv", uid);
@@ -121,34 +124,11 @@ void savePartnersToFile(const char* uid) {
 
     Partner* current = head;
     while (current != NULL) {
-        fprintf(file, "%s,%s,%d,%d\n", current->name, current->place, current->relationshipScore, current->distance);
+        // บันทึกค่า userLocation และ partnerLocation เป็น 0,0
+        fprintf(file, "%s,%d,0,0\n", current->name, current->relationshipScore);
         current = current->next;
     }
 
     fclose(file);
     printf("Partner data saved to %s\n", filename);
-}
-
-// Function to get distance from distance.csv
-int getDistance(const char* from, const char* to) {
-    FILE* file = fopen("data/distance.csv", "r");
-    if (!file) {
-        perror("Error opening distance.csv");
-        return -1;
-    }
-
-    char line[256];
-    char place1[50], place2[50];
-    int distance;
-
-    while (fgets(line, sizeof(line), file)) {
-        sscanf(line, "%[^,],%[^,],%d", place1, place2, &distance);
-        if (strcmp(from, place1) == 0 && strcmp(to, place2) == 0) {
-            fclose(file);
-            return distance;
-        }
-    }
-
-    fclose(file);
-    return -1; // Return -1 if no matching place is found
 }
