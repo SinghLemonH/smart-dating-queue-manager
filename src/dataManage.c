@@ -87,17 +87,16 @@ void loadPartnersFromFile(const char* uid) {
 
     char line[256];
     while (fgets(line, sizeof(line), file)) {
-        char name[50];
+        char name[50], place[50];
         int relationshipScore;
 
-        // อ่านข้อมูลจากไฟล์ CSV
-        if (sscanf(line, "%[^,],%d", name, &relationshipScore) == 2) {
+        if (sscanf(line, "%[^,],%d,%[^,\n]", name, &relationshipScore, place) == 3) {
             Partner* newPartner = (Partner*)malloc(sizeof(Partner));
             strcpy(newPartner->name, name);
             newPartner->relationshipScore = relationshipScore;
+            strcpy(newPartner->place, place); // โหลดข้อมูล place
             newPartner->next = NULL;
 
-            // เพิ่ม Partner เข้า Priority Queue
             if (head == NULL) {
                 head = newPartner;
                 tail = newPartner;
@@ -131,4 +130,127 @@ void savePartnersToFile(const char* uid) {
 
     fclose(file);
     printf("Partner data saved to %s\n", filename);
+}
+
+void updatePartnerLocation(const char* uid, const char* partnerName, const char* userLocation, const char* partnerLocation) {
+    char filename[100];
+    sprintf(filename, "data/partners/partner_%s.csv", uid);
+
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        printf("Error: Could not open file %s\n", filename);
+        return;
+    }
+
+    char tempFilename[100];
+    sprintf(tempFilename, "data/partners/temp_%s.csv", uid);
+    FILE* tempFile = fopen(tempFilename, "w");
+    if (!tempFile) {
+        printf("Error: Could not create temporary file.\n");
+        fclose(file);
+        return;
+    }
+
+    char line[256];
+    while (fgets(line, sizeof(line), file)) {
+        char name[50];
+        int relationshipScore;
+        char userLoc[50], partnerLoc[50];
+
+        if (sscanf(line, "%[^,],%d,%[^,],%[^,\n]", name, &relationshipScore, userLoc, partnerLoc) == 4) {
+            if (strcmp(name, partnerName) == 0) {
+                // Update location
+                fprintf(tempFile, "%s,%d,%s,%s\n", name, relationshipScore, userLocation, partnerLocation);
+            } else {
+                // Write original data
+                fprintf(tempFile, "%s,%d,%s,%s\n", name, relationshipScore, userLoc, partnerLoc);
+            }
+        }
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    // Replace original file with updated file
+    remove(filename);
+    rename(tempFilename, filename);
+
+    printf("Updated location for Partner: %s\n", partnerName);
+}
+
+void saveScheduleToFile(const char* uid) {
+    char filename[100];
+    sprintf(filename, "data/schedule/sch_%s.csv", uid);
+
+    FILE* file = fopen(filename, "w");
+    if (!file) {
+        printf("Error: Could not open file %s for writing.\n", filename);
+        return;
+    }
+
+    Partner* current = head;
+    while (current != NULL) {
+        fprintf(file, "%s,%s\n", current->name, current->time); // บันทึกชื่อ Partner และเวลานัดหมาย
+        current = current->next;
+    }
+
+    fclose(file);
+    printf("Schedule saved to %s successfully.\n", filename);
+}
+
+void loadScheduleFromFile(const char* uid) {
+    char filename[100];
+    sprintf(filename, "data/schedule/sch_%s.csv", uid);
+
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        printf("No existing schedule found for UID: %s.\n", uid);
+        return;
+    }
+
+    char line[100];
+    while (fgets(line, sizeof(line), file)) {
+        char name[50], time[20];
+        if (sscanf(line, "%[^,],%s", name, time) == 2) {
+            // ตรวจสอบว่ามี Partner นี้อยู่แล้วหรือไม่
+            Partner* current = head;
+            int exists = 0;
+            while (current != NULL) {
+                if (strcmp(current->name, name) == 0) {
+                    exists = 1; // พบข้อมูลซ้ำ
+                    break;
+                }
+                current = current->next;
+            }
+
+            if (exists) {
+                // อัปเดตเวลาของ Partner ที่มีอยู่แล้ว
+                strcpy(current->time, time);
+                continue; // ข้ามการเพิ่ม Partner ใหม่
+            }
+
+            // เพิ่ม Partner ใหม่หากไม่มีข้อมูลซ้ำ
+            Partner* newPartner = (Partner*)malloc(sizeof(Partner));
+            if (!newPartner) {
+                printf("Error: Memory allocation failed.\n");
+                fclose(file);
+                return;
+            }
+
+            strcpy(newPartner->name, name);
+            strcpy(newPartner->time, time); // กำหนดค่าเวลาจากไฟล์ CSV
+            newPartner->next = NULL;
+
+            if (head == NULL) {
+                head = newPartner;
+                tail = newPartner;
+            } else {
+                tail->next = newPartner;
+                tail = newPartner;
+            }
+        }
+    }
+
+    fclose(file);
+    printf("Schedule loaded from %s successfully.\n", filename);
 }

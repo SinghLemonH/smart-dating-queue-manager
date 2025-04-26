@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "priorityQueue.h"
-#include "../include/dataManage.h" // สำหรับ getDistance()
+#include "../include/dataManage.h"
+#include "dijkstras.h"
 
 Partner* head = NULL; // หัวของ Priority Queue
 Partner* tail = NULL; // ท้ายของ Priority Queue
@@ -23,16 +24,13 @@ void addPartner(const char* partnerName, int relationshipScore, const char* uid)
 
     // แทรก Partner ลงใน Priority Queue (เรียงตาม relationshipScore)
     if (head == NULL || relationshipScore > head->relationshipScore) {
-        // กรณีที่ Priority Queue ว่าง หรือ Partner ใหม่มีคะแนนสูงสุด
         newPartner->next = head;
         head = newPartner;
 
-        // อัปเดต tail หากเป็น Partner ตัวแรก
         if (tail == NULL) {
             tail = newPartner;
         }
     } else {
-        // กรณีที่ต้องแทรก Partner ในตำแหน่งที่เหมาะสม
         Partner* current = head;
         while (current->next != NULL && current->next->relationshipScore >= relationshipScore) {
             current = current->next;
@@ -40,7 +38,6 @@ void addPartner(const char* partnerName, int relationshipScore, const char* uid)
         newPartner->next = current->next;
         current->next = newPartner;
 
-        // อัปเดต tail หากเพิ่ม Partner ที่ท้ายลิสต์
         if (newPartner->next == NULL) {
             tail = newPartner;
         }
