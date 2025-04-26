@@ -5,6 +5,8 @@
 typedef struct Partner {
     char name[50];          // ชื่อของ Partner
     int relationshipScore;  // คะแนนความสัมพันธ์
+    char place[50];         // สถานที่ของ Partner
+    char time[20];     
     struct Partner* next;   // ชี้ไปยัง Partner ถัดไปใน Priority Queue
 } Partner;
 

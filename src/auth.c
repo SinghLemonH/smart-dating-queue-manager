@@ -38,6 +38,8 @@ void loginMenu(const char* filename) {
 }
 
 void mainMenu(const char* filename, const char* uid) {
+    loadScheduleFromFile(uid);
+    
     int choice;
     do {
         printf("\n+-----------------------------------+\n");
@@ -56,7 +58,7 @@ void mainMenu(const char* filename, const char* uid) {
         switch (choice) {
             case 1:
                 printf("\nViewing partner status for UID: %s\n", uid);
-                viewPartnerStatus(uid); // เรียกฟังก์ชันแสดงตารางนัดหมาย
+                viewPartnerStatus(uid);
                 break;
             case 2: {
                 printf("\nAdding partner for UID: %s\n", uid);
@@ -68,7 +70,6 @@ void mainMenu(const char* filename, const char* uid) {
                 printf("Enter Relationship Score: ");
                 scanf("%d", &relationshipScore);
             
-                // เพิ่ม Partner โดยไม่ต้องใช้ userLocation หรือ partnerLocation
                 addPartner(partnerName, relationshipScore, uid);
                 break; 
             }
@@ -78,14 +79,35 @@ void mainMenu(const char* filename, const char* uid) {
                 printf("Enter Partner Name to Delete: ");
                 scanf("%s", partnerName);
 
-                deletePartner(partnerName, uid); // ลบ Partner
+                deletePartner(partnerName, uid);
                 break;
             }
-            case 4:
-                printf("\nScheduling a date...\n");
+            case 4: {
+                printf("\nScheduling a date for UID: %s\n", uid);
+            
+                char userLocation[50], partnerLocation[50];
+                printf("Enter your location: ");
+                scanf("%s", userLocation);
+            
+                Partner* current = head;
+                while (current != NULL) {
+                    printf("\nScheduling for Partner: %s\n", current->name);
+                    printf("Enter Partner's location: ");
+                    scanf("%s", partnerLocation);
+            
+                    // Update the CSV file
+                    updatePartnerLocation(uid, current->name, userLocation, partnerLocation);
+            
+                    current = current->next;
+                }
+            
+                // Calculate the schedule
+                calculateSchedule(userLocation, uid);
                 break;
+            }
             case 5:
                 printf("\nViewing schedule...\n");
+                viewSchedule(uid);
                 break;
             case 6:
                 logout();
@@ -111,11 +133,7 @@ void login(const char* filename) {
             if (strcmp(current->username, username) == 0 && strcmp(current->password, password) == 0) {
                 printf("Login successful! Welcome, %s\n", current->username);
 
-                // ตรวจสอบและโหลดข้อมูล Partner จากไฟล์
-                char partnerFile[100];
-                sprintf(partnerFile, "data/partners/partner_%s.csv", current->uid);
-
-                // โหลดข้อมูล Partner เข้า Priority Queue
+                // Load partner data from file
                 loadPartnersFromFile(current->uid);
 
                 // Proceed to main menu
@@ -167,6 +185,6 @@ void registerUser(const char* filename, int year) {
 
 void logout() {
     printf("Logging out...\n");
-    freePriorityQueue(); // ล้าง Priority Queue เมื่อ Logout
+    freePriorityQueue(); // Clear Priority Queue on logout
     printf("Logged out successfully.\n");
 }
