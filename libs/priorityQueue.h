@@ -21,5 +21,6 @@ void viewPartnerStatus(const char* uid);
 void freePriorityQueue();
 
 const char* getRelationshipLevel(int score);
+void displayRelation();
 
 #endif // PRIORITYQUEUE_H

@@ -64,9 +64,12 @@ void mainMenu(const char* filename, const char* uid) {
                 printf("\nAdding partner for UID: %s\n", uid);
                 char partnerName[50];
                 int relationshipScore;
-            
+                
                 printf("Enter Partner Name: ");
                 scanf("%s", partnerName);
+                
+                displayRelation();
+
                 printf("Enter Relationship Score: ");
                 scanf("%d", &relationshipScore);
             
@@ -84,24 +87,16 @@ void mainMenu(const char* filename, const char* uid) {
             }
             case 4: {
                 printf("\nScheduling a date for UID: %s\n", uid);
-            
-                char userLocation[50], partnerLocation[50];
+
+                char userLocation[50];
+
+                displayUserLocation();
+
                 printf("Enter your location: ");
                 scanf("%s", userLocation);
-            
-                Partner* current = head;
-                while (current != NULL) {
-                    printf("\nScheduling for Partner: %s\n", current->name);
-                    printf("Enter Partner's location: ");
-                    scanf("%s", partnerLocation);
-            
-                    // Update the CSV file
-                    updatePartnerLocation(uid, current->name, userLocation, partnerLocation);
-            
-                    current = current->next;
-                }
-            
-                // Calculate the schedule
+
+                displayPartnerLocation(userLocation);
+                
                 calculateSchedule(userLocation, uid);
                 break;
             }
