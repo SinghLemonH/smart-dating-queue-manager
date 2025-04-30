@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <time.h>
+
 #include "../libs/hashTable.h"
 #include "../include/dataManage.h"
 #include "../include/auth.h"
@@ -26,7 +29,7 @@ void loginMenu(const char* filename) {
                 login(filename);
                 break;
             case 2:
-                registerUser(filename, 2025); // Example year for UID generation
+                registerUser(filename);
                 break;
             case 3:
                 printf("\nExiting the system. Goodbye!\n");
@@ -142,7 +145,7 @@ void login(const char* filename) {
     printf("Invalid Username or Password. Please try again.\n");
 }
 
-void registerUser(const char* filename, int year) {
+void registerUser(const char* filename) {
     char username[50], password[50], uid[10];
     printf("\n=== Register ===\n");
     printf("Enter Username: ");
@@ -163,10 +166,15 @@ void registerUser(const char* filename, int year) {
     printf("Enter Password: ");
     scanf("%s", password);
 
+    // Get the current year
+    time_t t = time(NULL);
+    struct tm* currentTime = localtime(&t);
+    int year = currentTime->tm_year + 1900; // tm_year นับจากปี 1900
+
     // Generate UID
     int sequence = 1;
     do {
-        sprintf(uid, "%d%02d", year % 100, sequence++);
+        sprintf(uid, "%d%02d", year % 100, sequence++); // ใช้ปีปัจจุบัน
     } while (searchUser(uid));
 
     // Insert user into hash table
