@@ -18,4 +18,8 @@ void viewSchedule(const char* uid);
 
 void editSchedule();
 
+void displayUserLocation();
+
+void displayPartnerLocation(const char* userLocation);
+
 #endif // DIJKSTRAS_H

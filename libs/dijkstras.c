@@ -162,9 +162,9 @@ void viewSchedule(const char* uid) {
         return;
     }
 
-    printf("\n+-------------------------------+\n");
+    printf("\n+-----------------------------------+\n");
     printf("| No. | Partner       | Time       |\n");
-    printf("+-------------------------------+\n");
+    printf("+-----------------------------------+\n");
 
     int index = 1;
     Partner* current = head;
@@ -173,5 +173,74 @@ void viewSchedule(const char* uid) {
         current = current->next;
     }
 
-    printf("+-------------------------------+\n");
+    printf("+-----------------------------------+\n");
+}
+
+void displayUserLocation() {
+    printf("\n+-------------------+\n");
+    printf("| Available Locations |\n");
+    printf("+-------------------+\n");
+    for (int i = 0; i < locationCount; i++) {
+        printf("| %-17s |\n", locations[i]);
+    }
+    printf("+-------------------+\n");
+}
+
+void displayPartnerLocation(const char* userLocation) {
+    int userIndex = -1;
+
+    // ค้นหาดัชนีของสถานที่ผู้ใช้
+    for (int i = 0; i < locationCount; i++) {
+        if (strcmp(locations[i], userLocation) == 0) {
+            userIndex = i;
+            break;
+        }
+    }
+
+    if (userIndex == -1) {
+        printf("Invalid user location: %s\n", userLocation);
+        return;
+    }
+
+    // คำนวณระยะทางที่สั้นที่สุดจาก userLocation ไปยังทุกสถานที่
+    int dist[MAX_LOCATIONS];
+    int path[MAX_LOCATIONS];
+    for (int i = 0; i < MAX_LOCATIONS; i++) {
+        dist[i] = INF;
+    }
+    dist[userIndex] = 0;
+
+    int visited[MAX_LOCATIONS] = {0};
+    for (int i = 0; i < locationCount - 1; i++) {
+        int minDist = INF, u = -1;
+        for (int j = 0; j < locationCount; j++) {
+            if (!visited[j] && dist[j] < minDist) {
+                minDist = dist[j];
+                u = j;
+            }
+        }
+
+        if (u == -1) break;
+        visited[u] = 1;
+
+        for (int v = 0; v < locationCount; v++) {
+            if (!visited[v] && graph[u][v] != INF && dist[u] + graph[u][v] < dist[v]) {
+                dist[v] = dist[u] + graph[u][v];
+            }
+        }
+    }
+
+    // แสดงตารางระยะทาง
+    printf("\n+-------------------+-------------------+\n");
+    printf("| Location          | Distance (km)    |\n");
+    printf("+-------------------+-------------------+\n");
+    for (int i = 0; i < locationCount; i++) {
+        if (i == userIndex) continue; // ข้ามสถานที่ของผู้ใช้เอง
+        if (dist[i] == INF) {
+            printf("| %-17s | %-17s |\n", locations[i], "Unreachable");
+        } else {
+            printf("| %-17s | %-17d |\n", locations[i], dist[i]);
+        }
+    }
+    printf("+-------------------+-------------------+\n");
 }

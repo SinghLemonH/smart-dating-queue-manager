@@ -120,19 +120,21 @@ void viewPartnerStatus(const char* uid) {
         return;
     }
 
-    printf("\n+-----------------------------------+\n");
-    printf("|         Partner Status            |\n");
-    printf("+-----------------------------------+\n");
-    printf("| Name                | Score       |\n");
-    printf("+-----------------------------------+\n");
+    printf("\n+--------------------------------------+\n");
+    printf("|         Partner Status               |\n");
+    printf("+--------------------------------------+\n");
+    printf("| Name                 | Status        |\n");
+    printf("+--------------------------------------+\n");
 
     Partner* current = head;
     while (current != NULL) {
-        printf("| %-20s | %-10d |\n", current->name, current->relationshipScore);
+        // ใช้ getRelationshipLevel() เพื่อแปลงคะแนนเป็นสถานะ
+        const char* status = getRelationshipLevel(current->relationshipScore);
+        printf("| %-20s | %-13s |\n", current->name, status);
         current = current->next;
     }
 
-    printf("+-----------------------------------+\n");
+    printf("+--------------------------------------+\n");
 }
 
 void freePriorityQueue() {
@@ -163,4 +165,16 @@ const char* getRelationshipLevel(int score) {
         default:
             return "Unknown"; // กรณีคะแนนไม่อยู่ในช่วง 1-5
     }
+}
+
+void displayRelation() {
+    printf("\n+-------------------+-------------------+\n");
+    printf("| Relationship Score | Status            |\n");
+    printf("+-------------------+-------------------+\n");
+    printf("| 1                 | Acquaintance      |\n");
+    printf("| 2                 | Casual Friend     |\n");
+    printf("| 3                 | Close Friend      |\n");
+    printf("| 4                 | Best Friend       |\n");
+    printf("| 5                 | Soulmate          |\n");
+    printf("+-------------------+-------------------+\n");
 }

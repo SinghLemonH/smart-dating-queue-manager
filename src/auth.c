@@ -64,9 +64,12 @@ void mainMenu(const char* filename, const char* uid) {
                 printf("\nAdding partner for UID: %s\n", uid);
                 char partnerName[50];
                 int relationshipScore;
-            
+                
                 printf("Enter Partner Name: ");
                 scanf("%s", partnerName);
+                
+                displayRelation();
+
                 printf("Enter Relationship Score: ");
                 scanf("%d", &relationshipScore);
             
@@ -86,10 +89,14 @@ void mainMenu(const char* filename, const char* uid) {
                 printf("\nScheduling a date for UID: %s\n", uid);
 
                 char userLocation[50];
+
+                displayUserLocation();
+
                 printf("Enter your location: ");
                 scanf("%s", userLocation);
 
-                // คำนวณตารางนัดหมาย
+                displayPartnerLocation(userLocation);
+                
                 calculateSchedule(userLocation, uid);
                 break;
             }

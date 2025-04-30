@@ -10,7 +10,7 @@ User* hashTable[TABLE_SIZE] = { NULL };
 unsigned int hash(const char* uid) {
     unsigned int hash = 0;
     while (*uid) {
-        hash = (hash * 31) + *uid++; // คูณค่า hash ด้วย 31 และบวกค่าของตัวอักษร
+        hash = (hash * 31) + (*uid++); // คูณค่า hash ด้วย 31 และบวกค่าของตัวอักษร
     }
     return hash % TABLE_SIZE; // นำผลลัพธ์ไป mod ด้วยขนาดของตารางแฮช
 }
