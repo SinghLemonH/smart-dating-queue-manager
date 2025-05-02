@@ -190,7 +190,7 @@ void saveScheduleToFile(const char* uid) {
 
     Partner* current = head;
     while (current != NULL) {
-        fprintf(file, "%s,%s\n", current->name, current->time); // บันทึกชื่อ Partner และเวลานัดหมาย
+        fprintf(file, "%s,%s\n", current->name, current->time); // บันทึกชื่อ Partner และวันที่
         current = current->next;
     }
 

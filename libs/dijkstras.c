@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+
 #include "dijkstras.h"
 #include "priorityQueue.h"
+
 #include "../include/dataManage.h"
 
 #define INF 99999
 
-// กราฟระยะทางระหว่างสถานที่
 int graph[MAX_LOCATIONS][MAX_LOCATIONS] = {
     {0, 42, 62, INF, 52, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF}, // BU
     {42, 0, 28, INF, 34, 15, INF, INF, INF, INF, INF, INF, INF, INF, 62},  // CU
@@ -25,12 +27,11 @@ int graph[MAX_LOCATIONS][MAX_LOCATIONS] = {
     {INF, 62, 38, INF, INF, INF, INF, INF, INF, INF, 72, INF, INF, INF, 0}  // SU
 };
 
-// ชื่อสถานที่
 char locations[MAX_LOCATIONS][10] = {
     "BU", "CU", "MU", "SWU", "KMILT", "KMUTT", "KMUTNB", "PSU", "CMU", "ABAC", "RU", "TU", "KKU", "KU", "SU"
 };
 
-int locationCount = 15; // จำนวนสถานที่ทั้งหมด
+int locationCount = 15; 
 
 int dijkstra(int start, int end, int* path) {
     int dist[MAX_LOCATIONS], visited[MAX_LOCATIONS], prev[MAX_LOCATIONS];
@@ -62,10 +63,9 @@ int dijkstra(int start, int end, int* path) {
     }
 
     if (dist[end] == INF) {
-        return INF; // ไม่มีเส้นทาง
+        return INF;
     }
 
-    // สร้างเส้นทาง
     int current = end, pathIndex = 0;
     while (current != -1) {
         path[pathIndex++] = current;
@@ -78,7 +78,6 @@ int dijkstra(int start, int end, int* path) {
 void calculateSchedule(const char* userLocation, const char* uid) {
     int userIndex = -1;
 
-    // ค้นหาดัชนีของสถานที่ผู้ใช้
     for (int i = 0; i < locationCount; i++) {
         if (strcmp(locations[i], userLocation) == 0) {
             userIndex = i;
@@ -97,24 +96,26 @@ void calculateSchedule(const char* userLocation, const char* uid) {
 
     Partner* current = head;
     Partner* prev = NULL;
-    int currentHour = 8;
 
-    // วนลูปผ่าน Partner ทั้งหมด
+    // pull today and start tomorrow naja
+    time_t t = time(NULL);
+    struct tm* currentDate = localtime(&t);
+    currentDate->tm_mday += 1; // add 1 day
+    mktime(currentDate); // handle chaged mount naja
+
     while (current != NULL) {
         printf("Enter location for %s (or type 'skip' to skip this partner): ", current->name);
         char partnerLocation[50];
         scanf("%s", partnerLocation);
 
-        // ตรวจสอบว่าผู้ใช้พิมพ์ "skip" หรือ "ไม่นัด"
-        if (strcmp(partnerLocation, "skip") == 0 || strcmp(partnerLocation, "ไม่นัด") == 0) {
-            // รีเซ็ตเวลานัดหมายของ Partner นี้
+        if (strcmp(partnerLocation, "skip") == 0 || strcmp(partnerLocation, "Skip") == 0) {
             strcpy(current->time, "N/A");
             prev = current;
             current = current->next;
             continue;
         }
 
-        // ตรวจสอบว่าสถานที่ที่กรอกถูกต้องหรือไม่
+        // check location naja
         int partnerIndex = -1;
         for (int i = 0; i < locationCount; i++) {
             if (strcmp(locations[i], partnerLocation) == 0) {
@@ -125,34 +126,33 @@ void calculateSchedule(const char* userLocation, const char* uid) {
 
         if (partnerIndex == -1) {
             printf("Invalid location: %s. Skipping this partner.\n", partnerLocation);
-            strcpy(current->time, "N/A"); // รีเซ็ตเวลานัดหมาย
+            strcpy(current->time, "N/A");
             prev = current;
             current = current->next;
             continue;
         }
 
-        // อัปเดตสถานที่ในไฟล์ CSV
         updatePartnerLocation(uid, current->name, userLocation, partnerLocation);
 
-        // คำนวณเวลานัดหมาย
         int path[MAX_LOCATIONS];
         int distance = dijkstra(userIndex, partnerIndex, path);
 
         if (distance != INF) {
-            int travelTime = distance / 50; // คำนวณเวลาการเดินทาง (1 ชั่วโมงต่อ 50 กิโลเมตร)
-            int startHour = currentHour + 1 + travelTime; // เว้น 1 ชั่วโมงก่อนเริ่ม และเพิ่มเวลาการเดินทาง
-            int endHour = startHour + 1; // เวลานัดหมาย 1 ชั่วโมง
-            sprintf(current->time, "%02d:00-%02d:00", startHour, endHour);
-            currentHour = endHour; // อัปเดตเวลาสำหรับ Partner ถัดไป
+            // to cal date naja
+            int travelDays = (distance / 500) + 1; // 500km per one
+            currentDate->tm_mday += travelDays; // add day from distance
+            mktime(currentDate); // to handle about changed mount
+
+            //set format of date naja
+            sprintf(current->time, "%02d/%02d/%04d", currentDate->tm_mday, currentDate->tm_mon + 1, currentDate->tm_year + 1900);
         } else {
-            strcpy(current->time, "N/A"); // หากไม่มีเส้นทาง
+            strcpy(current->time, "N/A"); // bno line
         }
 
         prev = current;
         current = current->next;
     }
 
-    // บันทึกตารางนัดหมายลงไฟล์ CSV
     saveScheduleToFile(uid);
 }
 
@@ -163,7 +163,7 @@ void viewSchedule(const char* uid) {
     }
 
     printf("\n+-----------------------------------+\n");
-    printf("| No. | Partner       | Time       |\n");
+    printf("| No. | Partner       | Date        |\n");
     printf("+-----------------------------------+\n");
 
     int index = 1;
@@ -174,6 +174,64 @@ void viewSchedule(const char* uid) {
     }
 
     printf("+-----------------------------------+\n");
+
+    editSchedule(uid);
+}
+
+void editSchedule(const char* uid) {
+    char choice;
+    printf("Are you okay with this schedule? (y/n): ");
+    scanf(" %c", &choice);
+
+    if (choice == 'y' || choice == 'Y') {
+        printf("Schedule confirmed.\n");
+        return;
+    }
+
+    if (choice == 'n' || choice == 'N') {
+        int partnerIndex;
+        char newDate[11];
+        int day, month, year;
+
+        printf("Enter the number of the partner you want to edit: ");
+        scanf("%d", &partnerIndex);
+
+        Partner* current = head;
+        int index = 1;
+
+        while (current != NULL && index < partnerIndex) {
+            current = current->next;
+            index++;
+        }
+
+        if (current == NULL) {
+            printf("Invalid partner number.\n");
+            return;
+        }
+
+        while (1) {
+            printf("Enter the new date for %s (dd/mm/yyyy): ", current->name);
+            scanf("%s", newDate);
+
+            // chack new date format
+            if (sscanf(newDate, "%2d/%2d/%4d", &day, &month, &year) == 3 &&
+                day >= 1 && day <= 31 &&
+                month >= 1 && month <= 12 &&
+                year >= 1900 && year <= 2100) {
+                break;
+            } else {
+                printf("Invalid date format. Please try again.\n");
+            }
+        }
+
+        strcpy(current->time, newDate);
+
+        saveScheduleToFile(uid);
+
+        printf("Schedule updated successfully.\n");
+    } else {
+        printf("Invalid choice. Please enter 'y' or 'n'.\n");
+    }
 }
 
 void displayUserLocation() {
@@ -189,7 +247,6 @@ void displayUserLocation() {
 void displayPartnerLocation(const char* userLocation) {
     int userIndex = -1;
 
-    // ค้นหาดัชนีของสถานที่ผู้ใช้
     for (int i = 0; i < locationCount; i++) {
         if (strcmp(locations[i], userLocation) == 0) {
             userIndex = i;
@@ -202,13 +259,13 @@ void displayPartnerLocation(const char* userLocation) {
         return;
     }
 
-    // คำนวณระยะทางที่สั้นที่สุดจาก userLocation ไปยังทุกสถานที่
+    // cal distance to all location 
     int dist[MAX_LOCATIONS];
     int path[MAX_LOCATIONS];
     for (int i = 0; i < MAX_LOCATIONS; i++) {
         dist[i] = INF;
     }
-    dist[userIndex] = 0;
+    dist[userIndex] = 0; // distance itself = 0
 
     int visited[MAX_LOCATIONS] = {0};
     for (int i = 0; i < locationCount - 1; i++) {
@@ -230,12 +287,10 @@ void displayPartnerLocation(const char* userLocation) {
         }
     }
 
-    // แสดงตารางระยะทาง
     printf("\n+-------------------+-------------------+\n");
     printf("| Location          | Distance (km)    |\n");
     printf("+-------------------+-------------------+\n");
     for (int i = 0; i < locationCount; i++) {
-        if (i == userIndex) continue; // ข้ามสถานที่ของผู้ใช้เอง
         if (dist[i] == INF) {
             printf("| %-17s | %-17s |\n", locations[i], "Unreachable");
         } else {
