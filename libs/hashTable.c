@@ -3,16 +3,15 @@
 #include <string.h>
 #include "hashTable.h"
 
-// Hash table array
+
 User* hashTable[TABLE_SIZE] = { NULL };
 
-// Hash function using UID
 unsigned int hash(const char* uid) {
     unsigned int hash = 0;
     while (*uid) {
-        hash = (hash * 31) + (*uid++); // คูณค่า hash ด้วย 31 และบวกค่าของตัวอักษร
+        hash = (hash * 31) + (*uid++);
     }
-    return hash % TABLE_SIZE; // นำผลลัพธ์ไป mod ด้วยขนาดของตารางแฮช
+    return hash % TABLE_SIZE;
 }
 
 // Insert user into hash table

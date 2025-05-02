@@ -80,6 +80,8 @@ void mainMenu(const char* filename, const char* uid) {
                 break; 
             }
             case 3: {
+                viewPartnerStatus(uid);
+
                 printf("\nDeleting partner for UID: %s\n", uid);
                 char partnerName[50];
                 printf("Enter Partner Name to Delete: ");
