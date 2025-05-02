@@ -97,27 +97,25 @@ void calculateSchedule(const char* userLocation, const char* uid) {
     Partner* current = head;
     Partner* prev = NULL;
 
-    // ดึงวันที่ปัจจุบันและเริ่มต้นจากวันพรุ่งนี้
+    // pull today and start tomorrow naja
     time_t t = time(NULL);
     struct tm* currentDate = localtime(&t);
-    currentDate->tm_mday += 1; // เพิ่ม 1 วัน
-    mktime(currentDate); // ปรับวันที่ให้ถูกต้อง (เช่น ข้ามเดือน)
+    currentDate->tm_mday += 1; // add 1 day
+    mktime(currentDate); // handle chaged mount naja
 
     while (current != NULL) {
         printf("Enter location for %s (or type 'skip' to skip this partner): ", current->name);
         char partnerLocation[50];
         scanf("%s", partnerLocation);
 
-        // ตรวจสอบว่าผู้ใช้พิมพ์ "skip" หรือ "ไม่นัด"
-        if (strcmp(partnerLocation, "skip") == 0 || strcmp(partnerLocation, "ไม่นัด") == 0) {
-            // รีเซ็ตเวลานัดหมายของ Partner นี้
+        if (strcmp(partnerLocation, "skip") == 0 || strcmp(partnerLocation, "Skip") == 0) {
             strcpy(current->time, "N/A");
             prev = current;
             current = current->next;
             continue;
         }
 
-        // ตรวจสอบว่าสถานที่ที่กรอกถูกต้องหรือไม่
+        // check location naja
         int partnerIndex = -1;
         for (int i = 0; i < locationCount; i++) {
             if (strcmp(locations[i], partnerLocation) == 0) {
@@ -128,36 +126,33 @@ void calculateSchedule(const char* userLocation, const char* uid) {
 
         if (partnerIndex == -1) {
             printf("Invalid location: %s. Skipping this partner.\n", partnerLocation);
-            strcpy(current->time, "N/A"); // รีเซ็ตเวลานัดหมาย
+            strcpy(current->time, "N/A");
             prev = current;
             current = current->next;
             continue;
         }
 
-        // อัปเดตสถานที่ในไฟล์ CSV
         updatePartnerLocation(uid, current->name, userLocation, partnerLocation);
 
-        // คำนวณระยะทาง
         int path[MAX_LOCATIONS];
         int distance = dijkstra(userIndex, partnerIndex, path);
 
         if (distance != INF) {
-            // คำนวณจำนวนวันที่ต้องใช้ในการเดินทาง
-            int travelDays = (distance / 500) + 1; // สมมติว่าเดินทางได้ 500 กม./วัน
-            currentDate->tm_mday += travelDays; // เพิ่มจำนวนวันตามระยะทาง
-            mktime(currentDate); // ปรับวันที่ให้ถูกต้อง (เช่น ข้ามเดือน)
+            // to cal date naja
+            int travelDays = (distance / 500) + 1; // 500km per one
+            currentDate->tm_mday += travelDays; // add day from distance
+            mktime(currentDate); // to handle about changed mount
 
-            // บันทึกวันที่ในรูปแบบ dd/mm/yyyy
+            //set format of date naja
             sprintf(current->time, "%02d/%02d/%04d", currentDate->tm_mday, currentDate->tm_mon + 1, currentDate->tm_year + 1900);
         } else {
-            strcpy(current->time, "N/A"); // หากไม่มีเส้นทาง
+            strcpy(current->time, "N/A"); // bno line
         }
 
         prev = current;
         current = current->next;
     }
 
-    // บันทึกตารางนัดหมายลงไฟล์ CSV
     saveScheduleToFile(uid);
 }
 
@@ -190,12 +185,12 @@ void editSchedule(const char* uid) {
 
     if (choice == 'y' || choice == 'Y') {
         printf("Schedule confirmed.\n");
-        return; // ออกจากฟังก์ชัน
+        return;
     }
 
     if (choice == 'n' || choice == 'N') {
         int partnerIndex;
-        char newDate[11]; // รูปแบบ dd/mm/yyyy
+        char newDate[11];
         int day, month, year;
 
         printf("Enter the number of the partner you want to edit: ");
@@ -204,7 +199,6 @@ void editSchedule(const char* uid) {
         Partner* current = head;
         int index = 1;
 
-        // ค้นหา Partner ที่ต้องการแก้ไข
         while (current != NULL && index < partnerIndex) {
             current = current->next;
             index++;
@@ -215,12 +209,11 @@ void editSchedule(const char* uid) {
             return;
         }
 
-        // รับวันที่ใหม่จากผู้ใช้
         while (1) {
             printf("Enter the new date for %s (dd/mm/yyyy): ", current->name);
             scanf("%s", newDate);
 
-            // ตรวจสอบรูปแบบวันที่
+            // chack new date format
             if (sscanf(newDate, "%2d/%2d/%4d", &day, &month, &year) == 3 &&
                 day >= 1 && day <= 31 &&
                 month >= 1 && month <= 12 &&
@@ -231,10 +224,8 @@ void editSchedule(const char* uid) {
             }
         }
 
-        // อัปเดตวันที่ในโครงสร้างข้อมูล
         strcpy(current->time, newDate);
 
-        // บันทึกการเปลี่ยนแปลงลงไฟล์ CSV
         saveScheduleToFile(uid);
 
         printf("Schedule updated successfully.\n");
@@ -256,7 +247,6 @@ void displayUserLocation() {
 void displayPartnerLocation(const char* userLocation) {
     int userIndex = -1;
 
-    // ค้นหาดัชนีของสถานที่ผู้ใช้
     for (int i = 0; i < locationCount; i++) {
         if (strcmp(locations[i], userLocation) == 0) {
             userIndex = i;
@@ -269,13 +259,13 @@ void displayPartnerLocation(const char* userLocation) {
         return;
     }
 
-    // คำนวณระยะทางที่สั้นที่สุดจาก userLocation ไปยังทุกสถานที่
+    // cal distance to all location 
     int dist[MAX_LOCATIONS];
     int path[MAX_LOCATIONS];
     for (int i = 0; i < MAX_LOCATIONS; i++) {
         dist[i] = INF;
     }
-    dist[userIndex] = 0; // ระยะทางจากตัวเองไปตัวเองคือ 0
+    dist[userIndex] = 0; // distance itself = 0
 
     int visited[MAX_LOCATIONS] = {0};
     for (int i = 0; i < locationCount - 1; i++) {
@@ -297,7 +287,6 @@ void displayPartnerLocation(const char* userLocation) {
         }
     }
 
-    // แสดงตารางระยะทาง
     printf("\n+-------------------+-------------------+\n");
     printf("| Location          | Distance (km)    |\n");
     printf("+-------------------+-------------------+\n");

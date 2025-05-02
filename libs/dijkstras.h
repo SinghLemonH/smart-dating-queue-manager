@@ -14,4 +14,4 @@ void displayUserLocation();
 
 void displayPartnerLocation(const char* userLocation);
 
-#endif // DIJKSTRAS_H
+#endif
