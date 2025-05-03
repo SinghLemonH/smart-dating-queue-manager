@@ -1,11 +1,11 @@
 #ifndef AUTH_H
 #define AUTH_H
 
-// Function declarations
-void loginMenu(const char* filename); // Display the login menu
-void mainMenu(const char* filename, const char* uid); // Display the main menu for a logged-in user
-void login(const char* filename); // Handle user login
-void registerUser(const char* filename); // Handle user registration
-void logout(); // เพิ่มการประกาศฟังก์ชัน logout
+void loginMenu(const char* filename); 
+void mainMenu(const char* filename, const char* uid); 
+void login(const char* filename); 
+void registerUser(const char* filename);
+void logout();
+void clearScreen();
 
 #endif // AUTH_H

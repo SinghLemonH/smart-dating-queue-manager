@@ -1,7 +1,6 @@
 #ifndef DATAMANAGE_H
 #define DATAMANAGE_H
 
-// Function declarations
 int fileExists(const char* format, const char* uid);
 void createFileIfNotExists(const char* format, const char* uid);
 

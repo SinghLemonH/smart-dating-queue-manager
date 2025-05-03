@@ -10,10 +10,10 @@
 #include "../libs/priorityQueue.h"
 #include "../libs/dijkstras.h"
 
-// Function to display the login menu
 void loginMenu(const char* filename) {
     int choice;
     do {
+        clearScreen();
         printf("\n+-----------------------------------+\n");
         printf("|             LOGIN MENU            |\n");
         printf("+-----------------------------------+\n");
@@ -45,6 +45,7 @@ void mainMenu(const char* filename, const char* uid) {
     
     int choice;
     do {
+        clearScreen();
         printf("\n+-----------------------------------+\n");
         printf("|           MAIN MENU               |\n");
         printf("+-----------------------------------+\n");
@@ -60,10 +61,12 @@ void mainMenu(const char* filename, const char* uid) {
 
         switch (choice) {
             case 1:
+                clearScreen();
                 printf("\nViewing partner status for UID: %s\n", uid);
                 viewPartnerStatus(uid);
                 break;
             case 2: {
+                clearScreen();
                 printf("\nAdding partner for UID: %s\n", uid);
                 char partnerName[50];
                 int relationshipScore;
@@ -80,6 +83,7 @@ void mainMenu(const char* filename, const char* uid) {
                 break; 
             }
             case 3: {
+                clearScreen();
                 viewPartnerStatus(uid);
 
                 printf("\nDeleting partner for UID: %s\n", uid);
@@ -91,6 +95,7 @@ void mainMenu(const char* filename, const char* uid) {
                 break;
             }
             case 4: {
+                clearScreen();
                 printf("\nScheduling a date for UID: %s\n", uid);
 
                 char userLocation[50];
@@ -106,13 +111,16 @@ void mainMenu(const char* filename, const char* uid) {
                 break;
             }
             case 5:
+                clearScreen();
                 printf("\nViewing schedule...\n");
                 viewSchedule(uid);
                 break;
             case 6:
+                clearScreen();
                 logout();
                 break;
             default:
+                clearScreen();
                 printf("\nInvalid choice. Please try again.\n");
         }
     } while (choice != 6);
@@ -133,10 +141,9 @@ void login(const char* filename) {
             if (strcmp(current->username, username) == 0 && strcmp(current->password, password) == 0) {
                 printf("Login successful! Welcome, %s\n", current->username);
 
-                // Load partner data from file
                 loadPartnersFromFile(current->uid);
 
-                // Proceed to main menu
+               
                 mainMenu(filename, current->uid);
                 return;
             }
@@ -153,7 +160,7 @@ void registerUser(const char* filename) {
     printf("Enter Username: ");
     scanf("%s", username);
 
-    // Check if the username already exists
+    // Check the username already exists ??
     for (int i = 0; i < TABLE_SIZE; i++) {
         User* current = hashTable[i];
         while (current) {
@@ -168,21 +175,19 @@ void registerUser(const char* filename) {
     printf("Enter Password: ");
     scanf("%s", password);
 
-    // Get the current year
+    // get current year
     time_t t = time(NULL);
     struct tm* currentTime = localtime(&t);
-    int year = currentTime->tm_year + 1900; // tm_year นับจากปี 1900
+    int year = currentTime->tm_year + 1900; // tm_year start for year 1900
 
-    // Generate UID
+    // Gen UID
     int sequence = 1;
     do {
-        sprintf(uid, "%d%02d", year % 100, sequence++); // ใช้ปีปัจจุบัน
+        sprintf(uid, "%d%02d", year % 100, sequence++); // make current year :L
     } while (searchUser(uid));
 
-    // Insert user into hash table
     insertUser(uid, username, password);
 
-    // Save updated hash table to file
     saveUsersToFile(filename);
 
     printf("Registration successful! Your UID is %s\n", uid);
@@ -192,4 +197,12 @@ void logout() {
     printf("Logging out...\n");
     freePriorityQueue(); // Clear Priority Queue on logout
     printf("Logged out successfully.\n");
+}
+
+void clearScreen() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
 }

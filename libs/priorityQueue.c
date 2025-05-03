@@ -5,24 +5,21 @@
 #include "../include/dataManage.h"
 #include "dijkstras.h"
 
-Partner* head = NULL; // หัวของ Priority Queue
-Partner* tail = NULL; // ท้ายของ Priority Queue
+Partner* head = NULL;
+Partner* tail = NULL;
 
-// Add a partner to the priority queue
 void addPartner(const char* partnerName, int relationshipScore, const char* uid) {
-    // สร้างโหนดใหม่สำหรับ Partner
     Partner* newPartner = (Partner*)malloc(sizeof(Partner));
     if (!newPartner) {
         printf("Error: Memory allocation failed.\n");
         return;
     }
 
-    // กำหนดค่าข้อมูลของ Partner
     strcpy(newPartner->name, partnerName);
     newPartner->relationshipScore = relationshipScore;
     newPartner->next = NULL;
 
-    // แทรก Partner ลงใน Priority Queue (เรียงตาม relationshipScore)
+    // add Partner sort by relationship !!! :D XD ;p
     if (head == NULL || relationshipScore > head->relationshipScore) {
         newPartner->next = head;
         head = newPartner;
@@ -45,7 +42,6 @@ void addPartner(const char* partnerName, int relationshipScore, const char* uid)
 
     printf("Partner %s added successfully with relationship score %d.\n", partnerName, relationshipScore);
 
-    // บันทึก Priority Queue ลงไฟล์ CSV
     savePartnersToFile(uid);
 }
 
@@ -57,10 +53,10 @@ void deletePartner(const char* partnerName, const char* uid) {
 
     Partner* current = head;
     Partner* prev = NULL;
-    Partner* target = NULL; // โหนดที่ต้องการลบ
-    Partner* targetPrev = NULL; // โหนดก่อนหน้า target
+    Partner* target = NULL; 
+    Partner* targetPrev = NULL; 
 
-    // ค้นหา Partner ที่มีชื่อที่ตรงกัน โดยเริ่มจากคะแนนต่ำสุดไปสูงสุด
+    // Serach Partner Start from score low to high 
     while (current != NULL) {
         if (strcmp(current->name, partnerName) == 0) {
             target = current;
@@ -75,21 +71,16 @@ void deletePartner(const char* partnerName, const char* uid) {
         return;
     }
 
-    // ลบ Partner ที่พบ
     if (targetPrev == NULL) {
-        // ลบ Partner ตัวแรก
         head = target->next;
 
-        // อัปเดต tail หากลบ Partner ตัวสุดท้าย
         if (head == NULL) {
             tail = NULL;
         }
     } else {
-        // ลบ Partner ตรงกลางหรือท้าย
         targetPrev->next = target->next;
 
-        // อัปเดต tail หากลบ Partner ตัวสุดท้าย
-        if (target == tail) {
+        if (target == tail) { // udate tail after del last queue na
             tail = targetPrev;
         }
     }
@@ -97,7 +88,6 @@ void deletePartner(const char* partnerName, const char* uid) {
     free(target);
     printf("Partner %s deleted successfully!\n", partnerName);
 
-    // บันทึก Priority Queue ลงไฟล์ CSV
     savePartnersToFile(uid);
 }
 
@@ -106,13 +96,11 @@ void deletePartner(const char* partnerName, const char* uid) {
 2)after view it's delet data of partners detail in csv */
 
 void viewPartnerStatus(const char* uid) {
-    // ตรวจสอบและสร้างไฟล์หากยังไม่มี
+
     createFileIfNotExists("data/partners/partner_%s.csv", uid);
 
-    // ล้าง Priority Queue ก่อนโหลดข้อมูลใหม่
     freePriorityQueue();
 
-    // โหลดข้อมูลจากไฟล์ของ UID ปัจจุบัน
     loadPartnersFromFile(uid);
 
     if (head == NULL) {
@@ -145,11 +133,10 @@ void freePriorityQueue() {
         free(temp);
     }
     head = NULL;
-    tail = NULL; // อัปเดต tail ให้เป็น NULL
+    tail = NULL; 
     printf("Priority Queue cleared.\n");
 }
 
-// Function to get relationship level name
 const char* getRelationshipLevel(int score) {
     switch (score) {
         case 1:

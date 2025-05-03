@@ -7,8 +7,6 @@
 
 #include "../include/dataManage.h"
 
-#define INF 99999
-
 int graph[MAX_LOCATIONS][MAX_LOCATIONS] = {
     {0, 42, 62, INF, 52, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF}, // BU
     {42, 0, 28, INF, 34, 15, INF, INF, INF, INF, INF, INF, INF, INF, 62},  // CU
@@ -146,7 +144,7 @@ void calculateSchedule(const char* userLocation, const char* uid) {
             //set format of date naja
             sprintf(current->time, "%02d/%02d/%04d", currentDate->tm_mday, currentDate->tm_mon + 1, currentDate->tm_year + 1900);
         } else {
-            strcpy(current->time, "N/A"); // bno line
+            strcpy(current->time, "N/A"); // no line no location
         }
 
         prev = current;
