@@ -30,9 +30,9 @@ A smart dating queue management system implemented in C as part of the CPE112 Da
 - GCC version 13 or higher
 - Make utility
 - Operating System:
-  - Windows 11 (primary support)
-  - Linux (supported)
-  - macOS (future support planned)
+  - Windows
+  - Linux 
+  - macOS 
 
 ## How to Run
 
@@ -52,12 +52,13 @@ cd smart-dating-queue-manager
 
 ```bash
 gcc -o main.exe src/main.c src/auth.c src/dataManage.c libs/hashTable.c libs/priorityQueue.c libs/dijkstras.c -Iinclude
+./main
 ```
 
 - On Linux or macOS:
 
 ```bash
-gcc -o main src/*.c libs/*.c -std=c99
+gcc -o main src/main.c src/auth.c src/dataManage.c libs/hashTable.c libs/priorityQueue.c libs/dijkstras.c -Iinclude
 ./main
 ```
 ## How It Works
@@ -83,6 +84,6 @@ gcc -o main src/*.c libs/*.c -std=c99
     - Data is cleared upon logout.
 
 ## Members
-- Ms. Thanaporn Bunlusilp (yok)
-- Mr. Wichitchai Suwanno (Singh)
-- Ms. Pilaiwan Churdchu (Chomphu)
+- Ms. Thanaporn Bunlusilp (yok) 67070503416
+- Mr. Wichitchai Suwanno (Singh) 67070503439
+- Ms. Pilaiwan Churdchu (Chomphu) 67070503492
