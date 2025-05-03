@@ -14,7 +14,6 @@ unsigned int hash(const char* uid) {
     return hash % TABLE_SIZE;
 }
 
-// Insert user into hash table
 void insertUser(const char* uid, const char* username, const char* password) {
     unsigned int index = hash(uid);
     User* newUser = (User*)malloc(sizeof(User));
@@ -29,7 +28,6 @@ void insertUser(const char* uid, const char* username, const char* password) {
     hashTable[index] = newUser;
 }
 
-// Search user in hash table
 User* searchUser(const char* uid) {
     unsigned int index = hash(uid);
     User* current = hashTable[index];
@@ -42,7 +40,6 @@ User* searchUser(const char* uid) {
     return NULL;
 }
 
-// Free memory used by the hash table
 void freeHashTable() {
     for (int i = 0; i < TABLE_SIZE; i++) {
         User* current = hashTable[i];

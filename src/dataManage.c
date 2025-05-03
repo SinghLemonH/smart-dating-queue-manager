@@ -12,9 +12,9 @@ int fileExists(const char* format, const char* uid) {
     FILE* file = fopen(filename, "r");
     if (file) {
         fclose(file);
-        return 1; // ไฟล์มีอยู่
+        return 1; //have file
     }
-    return 0; // ไฟล์ไม่มีอยู่
+    return 0; // have not file
 }
 
 void createFileIfNotExists(const char* format, const char* uid) {
@@ -27,7 +27,7 @@ void createFileIfNotExists(const char* format, const char* uid) {
         file = fopen(filename, "w");
         if (!file) {
             perror("Error creating file");
-            exit(1); // Exit the program if file creation fails
+            exit(1);
         }
         fclose(file);
         printf("File %s created successfully.\n", filename);
@@ -35,8 +35,7 @@ void createFileIfNotExists(const char* format, const char* uid) {
         fclose(file);
     }
 }
-
-// Function to load users from CSV file into the hash table
+//Convert csv into hashTable eiei
 void loadUsersFromFile(const char* filename) {
     FILE* file = fopen(filename, "r");
     if (!file) {
@@ -47,15 +46,15 @@ void loadUsersFromFile(const char* filename) {
     char line[256];
     while (fgets(line, sizeof(line), file)) {
         char uid[10], username[50], password[50];
-        sscanf(line, "%[^,],%[^,],%s", uid, username, password); // Parse CSV line
-        insertUser(uid, username, password); // Insert into hash table
+        sscanf(line, "%[^,],%[^,],%s", uid, username, password); 
+        insertUser(uid, username, password);
     }
 
     fclose(file);
     printf("Users loaded successfully from %s.\n", filename);
 }
 
-// Function to save users from the hash table to a CSV file
+// Convert Hashtable into csv eiei
 void saveUsersToFile(const char* filename) {
     FILE* file = fopen(filename, "w");
     if (!file) {
@@ -123,7 +122,6 @@ void savePartnersToFile(const char* uid) {
 
     Partner* current = head;
     while (current != NULL) {
-        // บันทึกค่า userLocation และ partnerLocation เป็น 0,0
         fprintf(file, "%s,%d,0,0\n", current->name, current->relationshipScore);
         current = current->next;
     }
@@ -159,10 +157,10 @@ void updatePartnerLocation(const char* uid, const char* partnerName, const char*
 
         if (sscanf(line, "%[^,],%d,%[^,],%[^,\n]", name, &relationshipScore, userLoc, partnerLoc) == 4) {
             if (strcmp(name, partnerName) == 0) {
-                // Update location
+                // uppdate location
                 fprintf(tempFile, "%s,%d,%s,%s\n", name, relationshipScore, userLocation, partnerLocation);
             } else {
-                // Write original data
+                // write origin data
                 fprintf(tempFile, "%s,%d,%s,%s\n", name, relationshipScore, userLoc, partnerLoc);
             }
         }
@@ -171,7 +169,6 @@ void updatePartnerLocation(const char* uid, const char* partnerName, const char*
     fclose(file);
     fclose(tempFile);
 
-    // Replace original file with updated file
     remove(filename);
     rename(tempFilename, filename);
 
@@ -212,24 +209,21 @@ void loadScheduleFromFile(const char* uid) {
     while (fgets(line, sizeof(line), file)) {
         char name[50], time[20];
         if (sscanf(line, "%[^,],%s", name, time) == 2) {
-            // ตรวจสอบว่ามี Partner นี้อยู่แล้วหรือไม่
             Partner* current = head;
             int exists = 0;
             while (current != NULL) {
                 if (strcmp(current->name, name) == 0) {
-                    exists = 1; // พบข้อมูลซ้ำ
+                    exists = 1;
                     break;
                 }
                 current = current->next;
             }
 
             if (exists) {
-                // อัปเดตเวลาของ Partner ที่มีอยู่แล้ว
                 strcpy(current->time, time);
-                continue; // ข้ามการเพิ่ม Partner ใหม่
+                continue;
             }
 
-            // เพิ่ม Partner ใหม่หากไม่มีข้อมูลซ้ำ
             Partner* newPartner = (Partner*)malloc(sizeof(Partner));
             if (!newPartner) {
                 printf("Error: Memory allocation failed.\n");
@@ -238,7 +232,7 @@ void loadScheduleFromFile(const char* uid) {
             }
 
             strcpy(newPartner->name, name);
-            strcpy(newPartner->time, time); // กำหนดค่าเวลาจากไฟล์ CSV
+            strcpy(newPartner->time, time);
             newPartner->next = NULL;
 
             if (head == NULL) {

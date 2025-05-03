@@ -1,20 +1,18 @@
 #ifndef PRIORITYQUEUE_H
 #define PRIORITYQUEUE_H
 
-// Partner structure
 typedef struct Partner {
-    char name[50];          // ชื่อของ Partner
-    int relationshipScore;  // คะแนนความสัมพันธ์
-    char place[50];         // สถานที่ของ Partner
+    char name[50];          
+    int relationshipScore;  
+    char place[50];         
     char time[20];     
-    struct Partner* next;   // ชี้ไปยัง Partner ถัดไปใน Priority Queue
+    struct Partner* next;   // point to next Partner in Priority Queue :< :A :O
 } Partner;
 
-// Declare head and tail as external variables
-extern Partner* head; // หัวของ Priority Queue
-extern Partner* tail; // ท้ายของ Priority Queue
+//send to dijkstar file to fixed schedule table, send to dataManage file to manage data in Priority Queue
+extern Partner* head; 
+extern Partner* tail; 
 
-// Priority Queue functions
 void addPartner(const char* partnerName, int relationshipScore, const char* uid);
 void deletePartner(const char* partnerName, const char* uid);
 void viewPartnerStatus(const char* uid);
