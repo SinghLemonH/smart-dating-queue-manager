@@ -45,7 +45,6 @@ void mainMenu(const char* filename, const char* uid) {
     
     int choice;
     do {
-        clearScreen();
         printf("\n+-----------------------------------+\n");
         printf("|           MAIN MENU               |\n");
         printf("+-----------------------------------+\n");

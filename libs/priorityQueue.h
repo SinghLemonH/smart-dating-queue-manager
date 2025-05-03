@@ -3,8 +3,9 @@
 
 typedef struct Partner {
     char name[50];          
-    int relationshipScore;  
-    char place[50];         
+    int relationshipScore;
+    char place[50];
+    int distance;         
     char time[20];     
     struct Partner* next;   // point to next Partner in Priority Queue :< :A :O
 } Partner;

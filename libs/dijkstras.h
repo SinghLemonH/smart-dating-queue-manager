@@ -6,6 +6,7 @@
 
 int dijkstra(int start, int end, int* path);
 
+float calculateScore(int relationshipScore, int distance);
 void calculateSchedule(const char* userLocation, const char* uid);
 void viewSchedule(const char* uid);
 void editSchedule(const char* uid);
