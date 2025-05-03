@@ -73,6 +73,13 @@ int dijkstra(int start, int end, int* path) {
     return dist[end];
 }
 
+float calculateScore(int relationshipScore, int distance) {
+    if (distance == INF) {
+        return -INF;
+    }
+    return (0.7 * relationshipScore) - (0.3 * distance);
+}
+
 void calculateSchedule(const char* userLocation, const char* uid) {
     int userIndex = -1;
 
@@ -108,6 +115,7 @@ void calculateSchedule(const char* userLocation, const char* uid) {
 
         if (strcmp(partnerLocation, "skip") == 0 || strcmp(partnerLocation, "Skip") == 0) {
             strcpy(current->time, "N/A");
+            current->distance = INF; // no dist >:(
             prev = current;
             current = current->next;
             continue;
@@ -125,6 +133,7 @@ void calculateSchedule(const char* userLocation, const char* uid) {
         if (partnerIndex == -1) {
             printf("Invalid location: %s. Skipping this partner.\n", partnerLocation);
             strcpy(current->time, "N/A");
+            current->distance = INF;
             prev = current;
             current = current->next;
             continue;
@@ -136,6 +145,10 @@ void calculateSchedule(const char* userLocation, const char* uid) {
         int distance = dijkstra(userIndex, partnerIndex, path);
 
         if (distance != INF) {
+            current->distance = distance;
+            float score = calculateScore(current->relationshipScore, distance);
+            printf("Score for %s: %.2f\n", current->name, score);
+
             // to cal date naja
             int travelDays = (distance / 500) + 1; // 500km per one
             currentDate->tm_mday += travelDays; // add day from distance
@@ -144,6 +157,7 @@ void calculateSchedule(const char* userLocation, const char* uid) {
             //set format of date naja
             sprintf(current->time, "%02d/%02d/%04d", currentDate->tm_mday, currentDate->tm_mon + 1, currentDate->tm_year + 1900);
         } else {
+            current->distance = INF;
             strcpy(current->time, "N/A"); // no line no location
         }
 
@@ -160,18 +174,18 @@ void viewSchedule(const char* uid) {
         return;
     }
 
-    printf("\n+-----------------------------------+\n");
-    printf("| No. | Partner       | Date        |\n");
-    printf("+-----------------------------------+\n");
+    printf("\n+-------------------------------------------+\n");
+    printf("| No. | Partner       | Date                |\n");
+    printf("+-------------------------------------------+\n");
 
     int index = 1;
     Partner* current = head;
     while (current != NULL) {
-        printf("| %-3d | %-12s | %-10s |\n", index++, current->name, current->time);
+        printf("| %-3d | %-12s | %-20s |\n", index++, current->name, current->time);
         current = current->next;
     }
 
-    printf("+-----------------------------------+\n");
+    printf("+-------------------------------------------+\n");
 
     editSchedule(uid);
 }
