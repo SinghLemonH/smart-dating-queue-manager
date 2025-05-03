@@ -51,8 +51,7 @@ cd smart-dating-queue-manager
 - On Windows:
 
 ```bash
-gcc -o [main.exe](http://_vscodecontentref_/0) src/*.c libs/*.c -std=c99
-[main.exe](http://_vscodecontentref_/1)
+gcc -o main.exe src/main.c src/auth.c src/dataManage.c libs/hashTable.c libs/priorityQueue.c libs/dijkstras.c -Iinclude
 ```
 
 - On Linux or macOS:
