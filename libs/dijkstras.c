@@ -77,7 +77,7 @@ float calculateScore(int relationshipScore, int distance) {
     if (distance == INF) {
         return -INF;
     }
-    return (0.7 * relationshipScore) - (0.3 * distance);
+    return (0.7 * (relationshipScore * 10)) - (0.3 * distance);
 }
 
 void calculateSchedule(const char* userLocation, const char* uid) {
