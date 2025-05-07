@@ -140,17 +140,17 @@ void freePriorityQueue() {
 const char* getRelationshipLevel(int score) {
     switch (score) {
         case 1:
-            return "Acquaintance"; // คนรู้จัก
+            return "Acquaintance"; //คนรู้จัก
         case 2:
-            return "Casual Friend"; // เพื่อนทั่วไป
+            return "Casual Friend"; //เพื่อนทั่วไป
         case 3:
-            return "Close Friend"; // เพื่อนสนิท
+            return "Close Friend"; //เพื่อนสนิท
         case 4:
-            return "Best Friend"; // เพื่อนที่ดีที่สุด
+            return "Best Friend"; //เพื่อนที่ดีที่สุด
         case 5:
-            return "Soulmate"; // คู่ชีวิต
+            return "Soulmate"; //คู่ชีวิต
         default:
-            return "Unknown"; // กรณีคะแนนไม่อยู่ในช่วง 1-5
+            return "Unknown"; //กรณีคะแนนไม่อยู่ในช่วง 1-5
     }
 }
 

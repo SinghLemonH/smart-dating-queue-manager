@@ -165,6 +165,7 @@ void calculateSchedule(const char* userLocation, const char* uid) {
         current = current->next;
     }
 
+    
     saveScheduleToFile(uid);
 }
 
@@ -230,6 +231,10 @@ void editSchedule(const char* uid) {
                 day >= 1 && day <= 31 &&
                 month >= 1 && month <= 12 &&
                 year >= 1900 && year <= 2100) {
+
+                struct tm input = { .tm_mday = day, .tm_mon = month-1, .tm_year = year-1900 }; //check past date ;k
+                if (difftime(mktime(&input), time(NULL)) >= 0) break;
+                else printf("Date is in the past. Try again.\n");
                 break;
             } else {
                 printf("Invalid date format. Please try again.\n");
