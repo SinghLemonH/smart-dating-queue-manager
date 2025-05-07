@@ -165,6 +165,7 @@ void calculateSchedule(const char* userLocation, const char* uid) {
         current = current->next;
     }
 
+    
     saveScheduleToFile(uid);
 }
 
