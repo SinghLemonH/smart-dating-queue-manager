@@ -163,7 +163,7 @@ void registerUser(const char* filename) {
     for (int i = 0; i < TABLE_SIZE; i++) {
         User* current = hashTable[i];
         while (current) {
-            if (strcmp(current->username, username) == 0) {
+            if (strcmp(current->username, username) == 0) { //we check from hash table
                 printf("Error: Username '%s' is already taken. Please try again.\n", username);
                 return;
             }
@@ -174,15 +174,15 @@ void registerUser(const char* filename) {
     printf("Enter Password: ");
     scanf("%s", password);
 
-    // get current year
-    time_t t = time(NULL);
-    struct tm* currentTime = localtime(&t);
-    int year = currentTime->tm_year + 1900; // tm_year start for year 1900
+    //get current year
+    time_t t = time(NULL); //ex.1715081445 (num of timestamp) (it's so hard to understanding :( )
+    struct tm* currentTime = localtime(&t); //this year is 125
+    int year = currentTime->tm_year + 1900; //tm_year start for year 1900 , Thus 125 + 1900 = 2025
 
-    // Gen UID
+    //gen UID
     int sequence = 1;
     do {
-        sprintf(uid, "%d%02d", year % 100, sequence++); // make current year :L
+        sprintf(uid, "%d%02d", year % 100, sequence++); //make current year :L
     } while (searchUser(uid));
 
     insertUser(uid, username, password);
@@ -194,7 +194,7 @@ void registerUser(const char* filename) {
 
 void logout() {
     printf("Logging out...\n");
-    freePriorityQueue(); // Clear Priority Queue on logout
+    freePriorityQueue(); //clear Priority Queue on logout
     printf("Logged out successfully.\n");
 }
 

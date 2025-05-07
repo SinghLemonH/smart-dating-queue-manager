@@ -56,7 +56,7 @@ void deletePartner(const char* partnerName, const char* uid) {
     Partner* target = NULL; 
     Partner* targetPrev = NULL; 
 
-    // Serach Partner Start from score low to high 
+    //Serach Partner Start from score low to high 
     while (current != NULL) {
         if (strcmp(current->name, partnerName) == 0) {
             target = current;

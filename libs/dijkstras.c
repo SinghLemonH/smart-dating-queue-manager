@@ -73,12 +73,12 @@ int dijkstra(int start, int end, int* path) {
     return dist[end];
 }
 
-float calculateScore(int relationshipScore, int distance) {
-    if (distance == INF) {
-        return -INF;
-    }
-    return (0.7 * (relationshipScore * 10)) - (0.3 * distance);
-}
+// float calculateScore(int relationshipScore, int distance) {
+//     if (distance == INF) {
+//         return -INF;
+//     }
+//     return (0.7 * (relationshipScore * 10)) - (0.3 * distance);
+// }
 
 void calculateSchedule(const char* userLocation, const char* uid) {
     int userIndex = -1;
@@ -146,11 +146,11 @@ void calculateSchedule(const char* userLocation, const char* uid) {
 
         if (distance != INF) {
             current->distance = distance;
-            float score = calculateScore(current->relationshipScore, distance);
-            printf("Score for %s: %.2f\n", current->name, score);
+            // float score = calculateScore(current->relationshipScore, distance);
+            // printf("Score for %s: %.2f\n", current->name, score);
 
             // to cal date naja
-            int travelDays = (distance / 500) + 1; // 500km per one
+            int travelDays = (distance / 300) + 1; // 300km per one
             currentDate->tm_mday += travelDays; // add day from distance
             mktime(currentDate); // to handle about changed mount
 
@@ -231,7 +231,7 @@ void editSchedule(const char* uid) {
                 day >= 1 && day <= 31 &&
                 month >= 1 && month <= 12 &&
                 year >= 1900 && year <= 2100) {
-
+                    
                 struct tm input = { .tm_mday = day, .tm_mon = month-1, .tm_year = year-1900 }; //check past date ;k
                 if (difftime(mktime(&input), time(NULL)) >= 0) break;
                 else printf("Date is in the past. Try again.\n");
